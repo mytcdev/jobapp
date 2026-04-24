@@ -9,8 +9,9 @@ out/
 .env.local
 .env*.local
 
-# Claude Code local memory
+# Claude Code
 .claude/
+CLAUDE.md
 
 # misc
 .DS_Store
