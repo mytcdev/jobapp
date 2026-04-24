@@ -1,0 +1,7 @@
+[project]
+# Your Supabase project reference ID (found in Project Settings → General)
+# project_id = "zkklabnhpzlnpomyyfxt"
+
+[db]
+# Port used by the local Supabase dev stack (supabase start)
+port = 5432
