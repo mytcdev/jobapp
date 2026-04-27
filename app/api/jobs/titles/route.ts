@@ -14,6 +14,8 @@ export async function GET(req: NextRequest) {
     .ilike("title", `%${q}%`)
     .limit(20);
 
-  const titles = [...new Set((data ?? []).map((j) => j.title))].slice(0, 8);
+  const seen: Record<string, true> = {};
+  for (const j of data ?? []) if (j.title) seen[j.title] = true;
+  const titles = Object.keys(seen).slice(0, 8);
   return NextResponse.json({ titles });
 }
