@@ -31,6 +31,30 @@ export async function sendStatusChangeEmail(opts: {
   }).catch(() => {});
 }
 
+export async function sendContactEmail(opts: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}) {
+  const adminEmails = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim()).filter(Boolean);
+  if (adminEmails.length === 0) return;
+  await getResend().emails.send({
+    from: `${SITE_NAME} <${FROM}>`,
+    to: adminEmails,
+    replyTo: opts.email,
+    subject: `[Contact] ${opts.subject}`,
+    html: `
+      <p><strong>Name:</strong> ${opts.name}</p>
+      <p><strong>Email:</strong> ${opts.email}</p>
+      <p><strong>Subject:</strong> ${opts.subject}</p>
+      <p><strong>Message:</strong></p>
+      <p style="white-space:pre-wrap">${opts.message}</p>
+      <p style="color:#999;font-size:12px;">${SITE_NAME} contact form submission</p>
+    `,
+  }).catch(() => {});
+}
+
 export async function sendNewApplicationEmail(opts: {
   to: string;
   staffName: string;

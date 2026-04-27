@@ -62,12 +62,7 @@ export default function GenerateResumeButton(props: Props) {
         y += lineH;
       }
 
-      doc.setDrawColor(200);
-      doc.line(marginX, y, W - marginX, y);
-      y += sectionGap;
-      doc.setTextColor(0);
-
-      function section(title: string) {
+      const section = (title: string) => {
         if (y > 260) { doc.addPage(); y = 20; }
         doc.setFont("helvetica", "bold");
         doc.setFontSize(11);
@@ -78,16 +73,21 @@ export default function GenerateResumeButton(props: Props) {
         y += 5;
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
-      }
+      };
 
-      function wrap(text: string, indent = 0) {
+      const wrap = (text: string, indent = 0) => {
         const lines = doc.splitTextToSize(text, contentW - indent);
         lines.forEach((line: string) => {
           if (y > 270) { doc.addPage(); y = 20; }
           doc.text(line, marginX + indent, y);
           y += lineH - 1;
         });
-      }
+      };
+
+      doc.setDrawColor(200);
+      doc.line(marginX, y, W - marginX, y);
+      y += sectionGap;
+      doc.setTextColor(0);
 
       // ── Skills ──────────────────────────────────────────────────────────
       if (props.skills?.length) {

@@ -51,6 +51,7 @@ export default function RichEditor({ content, onChange }: Props) {
   }
 
   function setLink() {
+    if (!editor) return;
     const prev = editor.getAttributes("link").href as string | undefined;
     const url  = window.prompt("URL", prev ?? "https://");
     if (url === null) return;

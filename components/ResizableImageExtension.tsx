@@ -1,16 +1,12 @@
 "use client";
 
 import { Node, mergeAttributes } from "@tiptap/core";
-import { ReactNodeViewRenderer, NodeViewWrapper } from "@tiptap/react";
+import { ReactNodeViewRenderer, NodeViewWrapper, type ReactNodeViewProps } from "@tiptap/react";
 import { useRef, useState, useCallback } from "react";
 
 /* ── Node view component ─────────────────────────────────── */
-function ResizableImageView({ node, updateAttributes, selected }: {
-  node:             { attrs: { src: string; alt?: string; title?: string; width: string; align: string } };
-  updateAttributes: (attrs: Record<string, unknown>) => void;
-  selected:         boolean;
-}) {
-  const { src, alt, title, width, align } = node.attrs;
+function ResizableImageView({ node, updateAttributes, selected }: ReactNodeViewProps) {
+  const { src, alt, title, width, align } = node.attrs as { src: string; alt?: string; title?: string; width: string; align: string };
   const startX   = useRef(0);
   const startW   = useRef(0);
   const imgRef   = useRef<HTMLImageElement>(null);
