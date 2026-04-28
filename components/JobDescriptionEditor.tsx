@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -14,11 +15,12 @@ export default function JobDescriptionEditor({
   initialContent = "",
   name = "description",
 }: Props) {
+  const [html, setHtml] = useState(initialContent);
+
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
       StarterKit.configure({
-        // disable extensions not needed for job descriptions
         blockquote: false,
         code: false,
         codeBlock: false,
@@ -29,11 +31,10 @@ export default function JobDescriptionEditor({
       Placeholder.configure({ placeholder: "Describe the role, responsibilities, and requirements…" }),
     ],
     content: initialContent,
+    onUpdate: ({ editor }) => setHtml(editor.getHTML()),
   });
 
   if (!editor) return null;
-
-  const html = editor.getHTML();
 
   const btn = (active: boolean, title: string, onClick: () => void, label: React.ReactNode) => (
     <button

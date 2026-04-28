@@ -45,10 +45,12 @@ export default function JobForm({ initial, clients }: { initial?: JobFormValues;
   const isEdit = !!initial?.id;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [saved, setSaved] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
+    setSaved(false);
     setLoading(true);
 
     const fd = new FormData(e.currentTarget);
@@ -87,8 +89,13 @@ export default function JobForm({ initial, clients }: { initial?: JobFormValues;
         const { error: msg } = await res.json();
         throw new Error(msg ?? "Failed");
       }
-      router.push("/admin/jobs");
-      router.refresh();
+      if (isEdit) {
+        setSaved(true);
+        router.refresh();
+      } else {
+        router.push("/admin/jobs");
+        router.refresh();
+      }
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -160,6 +167,7 @@ export default function JobForm({ initial, clients }: { initial?: JobFormValues;
         </div>
       )}
 
+      {saved && <p className="text-green-600 text-sm">Changes saved successfully.</p>}
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
       <button type="submit" disabled={loading}
