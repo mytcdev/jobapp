@@ -11,6 +11,9 @@ export async function GET(req: NextRequest) {
     supabase.from("users").select("skills"),
   ]);
 
+  if (jobsResult.error) console.error("[skills] jobs query error:", jobsResult.error.message);
+  if (usersResult.error) console.error("[skills] users query error:", usersResult.error.message);
+
   const seen: Record<string, true> = {};
   for (const row of jobsResult.data ?? [])
     for (const s of row.required_skills ?? []) seen[s] = true;
