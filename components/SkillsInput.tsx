@@ -8,7 +8,7 @@ interface Props {
 }
 
 export default function SkillsInput({ initialSkills = [], name = "required_skills" }: Props) {
-  const [skills, setSkills]           = useState<string[]>(initialSkills);
+  const [skills, setSkills]           = useState<string[]>(Array.isArray(initialSkills) ? initialSkills : []);
   const [input, setInput]             = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [activeIdx, setActiveIdx]     = useState(-1);

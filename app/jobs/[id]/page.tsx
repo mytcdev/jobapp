@@ -25,10 +25,10 @@ export async function generateMetadata({
   const location = [job.company, job.country].filter(Boolean).join(" · ");
   const desc = (job.description ?? "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 160);
   return {
-    title: `${job.title}${location ? ` at ${job.company}` : ""}`,
+    title: `${job.title}${job.company ? ` at ${job.company}` : ""}`,
     description: desc,
     openGraph: {
-      title: `${job.title} at ${job.company}`,
+      title: `${job.title}${job.company ? ` at ${job.company}` : ""}`,
       description: desc,
     },
   };
@@ -145,7 +145,7 @@ export default async function JobDetailPage({
       <div className="flex flex-col lg:flex-row gap-8 items-start">
       <div className="flex-1 min-w-0">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">{job.title}</h1>
+        <h1 className="text-3xl font-bold">{job.title}{job.company ? ` at ${job.company}` : ""}</h1>
         <p className="text-gray-500 mt-1">
           {job.company} &middot; {[job.city, job.state, job.country].filter(Boolean).join(", ")}
         </p>

@@ -97,7 +97,7 @@ export default async function JobsPage({
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h2 className="font-semibold text-lg">{job.title}</h2>
+                  <h2 className="font-semibold text-lg">{job.title}{job.company ? ` at ${job.company}` : ""}</h2>
                   <p className="text-gray-500 text-sm mt-0.5">
                     {job.company} &middot; {[job.city, job.state, job.country].filter(Boolean).join(", ")}
                   </p>
