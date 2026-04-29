@@ -6,6 +6,7 @@ import LocationPicker from "@/components/LocationPicker";
 import SkillsInput from "@/components/SkillsInput";
 import JobDescriptionEditor from "@/components/JobDescriptionEditor";
 import NationalityPicker from "@/components/NationalityPicker";
+import CategoryPicker from "@/components/CategoryPicker";
 
 const CURRENCIES = ["USD", "SGD", "MYR", "GBP", "AUD", "EUR", "CAD", "INR"];
 const STATUSES = [
@@ -36,6 +37,7 @@ export type JobFormValues = {
   work_type?: string;
   accepted_nationality?: string | null;
   owner_id?: string | null;
+  category_ids?: string[];
 };
 
 export type ClientOption = { id: string; username: string; company_name: string | null };
@@ -71,6 +73,7 @@ export default function JobForm({ initial, clients }: { initial?: JobFormValues;
       work_type: fd.get("work_type"),
       accepted_nationality: (fd.get("accepted_nationality") as string)?.trim() || null,
       owner_id: (fd.get("owner_id") as string) || null,
+      category_ids: ((fd.get("category_ids") as string) ?? "").split(",").filter(Boolean),
     };
     const min = fd.get("salary_min") as string;
     const max = fd.get("salary_max") as string;
@@ -151,6 +154,8 @@ export default function JobForm({ initial, clients }: { initial?: JobFormValues;
       <p className="text-xs text-gray-400 -mt-2">Only <strong>Published</strong> jobs appear on the public jobs page.</p>
 
       <NationalityPicker initialValue={initial?.accepted_nationality} />
+
+      <CategoryPicker initialIds={initial?.category_ids ?? []} />
 
       {clients && clients.length > 0 && (
         <div className="flex flex-col gap-1">

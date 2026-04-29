@@ -35,6 +35,7 @@ export default async function AdminLayout({
     { href: "/admin/jobs", label: "Jobs" },
     ...(role !== "manager" ? [{ href: "/admin/applications", label: "Applications", badge: pending > 0 ? pending : null }] : [{ href: "/admin/applications", label: "Applications", badge: pending > 0 ? pending : null }]),
     { href: "/admin/applicants", label: "Applicants" },
+    { href: "/admin/categories", label: "Categories" },
     { href: "/admin/cms/pages",  label: "Pages" },
     { href: "/admin/cms/menus",  label: "Menus" },
     ...(role === "admin" ? [{ href: "/admin/staff", label: "Users" }] : []),

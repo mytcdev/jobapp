@@ -21,7 +21,17 @@ const JobSchema = z.object({
   status: z.enum(["draft", "pending", "published"]).default("draft"),
   work_type: z.enum(["onsite", "remote", "hybrid"]).default("onsite"),
   accepted_nationality: z.string().optional().nullable(),
+  category_ids: z.array(z.string().uuid()).optional().default([]),
 });
+
+async function syncCategories(jobId: string, categoryIds: string[]) {
+  const db = getSupabase();
+  await db.from("job_categories").delete().eq("job_id", jobId);
+  if (categoryIds.length === 0) return;
+  await db.from("job_categories").insert(
+    categoryIds.map((category_id) => ({ job_id: jobId, category_id }))
+  );
+}
 
 async function ownsJob(staffId: string, jobId: string) {
   const { data } = await getSupabase()
@@ -44,15 +54,17 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   if (!parsed.success)
     return NextResponse.json({ error: "Invalid request", issues: parsed.error.issues }, { status: 400 });
 
+  const { category_ids, ...jobData } = parsed.data;
   const { data: job, error: dbError } = await getSupabase()
     .from("jobs")
-    .update(parsed.data)
+    .update(jobData)
     .eq("id", params.id)
     .select()
     .single();
 
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 });
 
+  await syncCategories(params.id, category_ids);
   revalidatePath("/jobs");
   revalidatePath(`/jobs/${params.id}`);
   return NextResponse.json({ job });

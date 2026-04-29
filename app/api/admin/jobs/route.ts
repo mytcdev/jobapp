@@ -22,7 +22,16 @@ const BodySchema = z.object({
   work_type: z.enum(["onsite", "remote", "hybrid"]).default("onsite"),
   accepted_nationality: z.string().optional().nullable(),
   owner_id: z.string().uuid().optional().nullable(),
+  category_ids: z.array(z.string().uuid()).optional().default([]),
 });
+
+async function syncCategories(jobId: string, categoryIds: string[]) {
+  await supabase.from("job_categories").delete().eq("job_id", jobId);
+  if (categoryIds.length === 0) return;
+  await supabase.from("job_categories").insert(
+    categoryIds.map((category_id) => ({ job_id: jobId, category_id }))
+  );
+}
 
 export async function POST(req: NextRequest) {
   const { error } = await requireStaff();
@@ -36,9 +45,10 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const { category_ids, ...jobData } = parsed.data;
   const { data: job, error: dbError } = await supabase
     .from("jobs")
-    .insert(parsed.data)
+    .insert(jobData)
     .select()
     .single();
 
@@ -46,6 +56,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: dbError.message }, { status: 500 });
   }
 
+  await syncCategories(job.id, category_ids);
   revalidatePath("/jobs");
   return NextResponse.json({ job }, { status: 201 });
 }

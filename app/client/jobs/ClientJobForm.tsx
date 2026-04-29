@@ -6,6 +6,7 @@ import LocationPicker from "@/components/LocationPicker";
 import SkillsInput from "@/components/SkillsInput";
 import JobDescriptionEditor from "@/components/JobDescriptionEditor";
 import NationalityPicker from "@/components/NationalityPicker";
+import CategoryPicker from "@/components/CategoryPicker";
 
 const CURRENCIES = ["USD", "SGD", "MYR", "GBP", "AUD", "EUR", "CAD", "INR"];
 const STATUSES   = [{ value: "draft", label: "Draft" }, { value: "pending", label: "Pending Review" }, { value: "published", label: "Published" }];
@@ -18,6 +19,7 @@ export type ClientJobValues = {
   required_skills?: string[];
   salary_min?: number; salary_max?: number; salary_currency?: string;
   status?: string; work_type?: string; accepted_nationality?: string | null;
+  category_ids?: string[];
 };
 
 export default function ClientJobForm({ initial }: { initial?: ClientJobValues }) {
@@ -40,6 +42,7 @@ export default function ClientJobForm({ initial }: { initial?: ClientJobValues }
       required_skills: skills, salary_currency: fd.get("salary_currency"),
       status: fd.get("status"), work_type: fd.get("work_type"),
       accepted_nationality: (fd.get("accepted_nationality") as string)?.trim() || null,
+      category_ids: ((fd.get("category_ids") as string) ?? "").split(",").filter(Boolean),
     };
     const min = fd.get("salary_min") as string;
     const max = fd.get("salary_max") as string;
@@ -125,6 +128,8 @@ export default function ClientJobForm({ initial }: { initial?: ClientJobValues }
       </div>
 
       <NationalityPicker initialValue={initial?.accepted_nationality} />
+
+      <CategoryPicker initialIds={initial?.category_ids ?? []} />
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
 

@@ -13,7 +13,7 @@ export default async function ClientProfilePage() {
 
   const { data: account } = await getSupabase()
     .from("staff_accounts")
-    .select("id, username, role, created_at, company_name, company_address, company_website, contact_email, contact_phone")
+    .select("id, username, role, created_at, company_name, company_address, company_website, contact_email, contact_phone, company_logo")
     .eq("id", session.user.staffId)
     .single();
 
@@ -49,6 +49,7 @@ export default async function ClientProfilePage() {
           company_website: account?.company_website,
           contact_email:   account?.contact_email,
           contact_phone:   account?.contact_phone,
+          company_logo:    account?.company_logo,
         }} />
       </section>
 

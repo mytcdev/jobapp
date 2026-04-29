@@ -11,12 +11,11 @@ export default async function EditClientJobPage({ params }: { params: { id: stri
   const session = await getServerSession(getAuthOptions());
   if (!session?.user.staffId) redirect("/client");
 
-  const { data: job, error } = await getSupabase()
-    .from("jobs")
-    .select("*")
-    .eq("id", params.id)
-    .eq("owner_id", session.user.staffId)
-    .single();
+  const db = getSupabase();
+  const [{ data: job, error }, { data: jobCats }] = await Promise.all([
+    db.from("jobs").select("*").eq("id", params.id).eq("owner_id", session.user.staffId).single(),
+    db.from("job_categories").select("category_id").eq("job_id", params.id),
+  ]);
 
   if (error || !job) notFound();
 
@@ -32,6 +31,7 @@ export default async function EditClientJobPage({ params }: { params: { id: stri
         required_skills: job.required_skills, salary_min: job.salary_min, salary_max: job.salary_max,
         salary_currency: job.salary_currency, status: job.status, work_type: job.work_type,
         accepted_nationality: job.accepted_nationality,
+        category_ids: (jobCats ?? []).map((r) => r.category_id),
       }} />
     </div>
   );

@@ -25,10 +25,10 @@ export async function generateMetadata({
   const location = [job.company, job.country].filter(Boolean).join(" · ");
   const desc = (job.description ?? "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 160);
   return {
-    title: `${job.title}${job.company ? ` at ${job.company}` : ""}`,
+    title: job.title,
     description: desc,
     openGraph: {
-      title: `${job.title}${job.company ? ` at ${job.company}` : ""}`,
+      title: job.title,
       description: desc,
     },
   };
@@ -53,6 +53,17 @@ export default async function JobDetailPage({
 
   if (jobResult.error || !jobResult.data) notFound();
   const job = jobResult.data;
+
+  // Fetch company logo from owner's profile if job has an owner
+  let companyLogo: string | null = null;
+  if (job.owner_id) {
+    const { data: owner } = await supabase
+      .from("staff_accounts")
+      .select("company_logo")
+      .eq("id", job.owner_id)
+      .single();
+    companyLogo = owner?.company_logo ?? null;
+  }
 
   // Score related jobs by skill overlap + same-country bonus
   const jobSkills: string[] = job.required_skills ?? [];
@@ -145,10 +156,26 @@ export default async function JobDetailPage({
       <div className="flex flex-col lg:flex-row gap-8 items-start">
       <div className="flex-1 min-w-0">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">{job.title}{job.company ? ` at ${job.company}` : ""}</h1>
-        <p className="text-gray-500 mt-1">
-          {job.company} &middot; {[job.city, job.state, job.country].filter(Boolean).join(", ")}
-        </p>
+        {/* Company identity */}
+        {job.company && (
+          <div className="flex items-center gap-3 mb-3">
+            {companyLogo ? (
+              <img src={companyLogo} alt={job.company} className="w-12 h-12 rounded-lg object-contain border bg-white p-1 shrink-0" />
+            ) : (
+              <div className="w-12 h-12 rounded-lg border bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-lg shrink-0">
+                {job.company[0].toUpperCase()}
+              </div>
+            )}
+            <div>
+              <p className="font-semibold text-gray-900">{job.company}</p>
+              <p className="text-sm text-gray-500">{[job.city, job.state, job.country].filter(Boolean).join(", ")}</p>
+            </div>
+          </div>
+        )}
+        <h1 className="text-3xl font-bold">{job.title}</h1>
+        {!job.company && (
+          <p className="text-gray-500 mt-1">{[job.city, job.state, job.country].filter(Boolean).join(", ")}</p>
+        )}
         <div className="flex flex-wrap items-center gap-2 mt-1">
           {job.work_type && (
             <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium">
