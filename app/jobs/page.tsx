@@ -54,7 +54,7 @@ export default async function JobsPage({
     slug: cat.slug,
     count: (cat.job_categories as unknown as { jobs: { status: string } }[])
       .filter((jc) => jc.jobs?.status === "published").length,
-  }));
+  })).filter((cat) => cat.count > 0);
 
   // Resolve category slug → id for filtering
   const activeCat = categories.find((c) => c.slug === catSlug);
