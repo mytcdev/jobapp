@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "app/api/onboarding/route.ts": { "maxDuration": 60 },
+    "app/api/profile/route.ts":    { "maxDuration": 60 },
+    "app/api/ai/**":               { "maxDuration": 60 }
+  }
+}

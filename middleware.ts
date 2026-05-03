@@ -54,9 +54,16 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // ── Non-onboarded regular users ───────────────────────────────────────────
-  if (token && role === "user" && token.onboardingComplete === false) {
-    const from = encodeURIComponent(pathname);
+  // ── Non-onboarded regular users (new social sign-ups only) ──────────────
+  if (
+    token &&
+    role === "user" &&
+    token.onboardingComplete === false &&
+    !pathname.startsWith("/onboarding") &&
+    !pathname.startsWith("/auth") &&
+    !pathname.startsWith("/api")
+  ) {
+    const from = encodeURIComponent(pathname + req.nextUrl.search);
     return NextResponse.redirect(new URL(`/onboarding?from=${from}`, req.url));
   }
 
@@ -64,13 +71,8 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
+  // Run on all routes except static assets, Next.js internals, and API routes
   matcher: [
-    "/admin", "/admin/:path*",
-    "/client", "/client/:path*",
-    "/staff", "/staff/:path*",
-    "/profile", "/profile/:path*",
-    "/applications", "/applications/:path*",
-    "/onboarding",
-    "/jobs", "/jobs/:path*",
+    "/((?!_next/static|_next/image|favicon\\.ico|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.svg$|.*\\.ico$|.*\\.webp$).*)",
   ],
 };

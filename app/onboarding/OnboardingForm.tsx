@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import type { EducationItem, ExperienceItem, PortfolioItem } from "@/lib/schema";
 
 type Tab = "bio" | "upload";
@@ -55,6 +56,7 @@ Targeting MYR 96,000/year`;
 
 export default function OnboardingForm({ redirectTo, userProfile }: Props) {
   const router = useRouter();
+  const { update } = useSession();
   const [tab, setTab] = useState<Tab>("bio");
   const [bio, setBio] = useState("");
   const [loading, setLoading] = useState(false);
@@ -80,24 +82,30 @@ export default function OnboardingForm({ redirectTo, userProfile }: Props) {
       }
       const { extracted, user } = await res.json();
 
-      // Auto-generate resume PDF from extracted profile
+      // Auto-generate resume PDF from extracted profile (best-effort, don't block redirect)
       setStep("generating");
-      await generateAndUploadResume({
-        name: extracted.name ?? user?.name,
-        email: user?.email,
-        city: extracted.city ?? user?.city,
-        state: extracted.state ?? user?.state,
-        country: extracted.country ?? user?.country,
-        skills: extracted.skills ?? [],
-        languages: extracted.languages ?? [],
-        preferred_salary: extracted.preferred_salary ?? user?.preferred_salary,
-        preferred_currency: extracted.preferred_currency ?? user?.preferred_currency ?? "USD",
-        experience: extracted.experience ?? [],
-        education: extracted.education ?? [],
-        portfolio: extracted.portfolio ?? [],
-      });
+      try {
+        await generateAndUploadResume({
+          name: extracted.name ?? user?.name,
+          email: user?.email,
+          city: extracted.city ?? user?.city,
+          state: extracted.state ?? user?.state,
+          country: extracted.country ?? user?.country,
+          skills: extracted.skills ?? [],
+          languages: extracted.languages ?? [],
+          preferred_salary: extracted.preferred_salary ?? user?.preferred_salary,
+          preferred_currency: extracted.preferred_currency ?? user?.preferred_currency ?? "USD",
+          experience: extracted.experience ?? [],
+          education: extracted.education ?? [],
+          portfolio: extracted.portfolio ?? [],
+        });
+      } catch {
+        // PDF generation is optional — continue to redirect regardless
+      }
 
-      router.push(redirectTo);
+      // Force JWT refresh so middleware sees onboardingComplete: true
+      await update();
+      window.location.href = redirectTo;
     } catch (err) {
       setError((err as Error).message);
       setStep("form");
@@ -123,7 +131,8 @@ export default function OnboardingForm({ redirectTo, userProfile }: Props) {
         const { error: msg } = await res.json();
         throw new Error(msg ?? "Upload failed");
       }
-      router.push(redirectTo);
+      await update();
+      window.location.href = redirectTo;
     } catch (err) {
       setError((err as Error).message);
     } finally {

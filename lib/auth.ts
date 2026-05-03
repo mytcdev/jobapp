@@ -75,7 +75,20 @@ export function getAuthOptions(): NextAuthOptions {
       },
       async jwt({ token, user, account }) {
         // `user` and `account` are only present on the first sign-in
-        if (!user) return token;
+        if (!user) {
+          // Re-check onboarding status from DB if JWT still says incomplete.
+          // This handles the case where onboarding completed but the token
+          // hasn't been refreshed yet, which would cause a redirect loop.
+          if (token.onboardingComplete === false && token.id && token.role === "user") {
+            const { data } = await getSupabase()
+              .from("users")
+              .select("onboarding_complete")
+              .eq("id", token.id as string)
+              .maybeSingle();
+            if (data?.onboarding_complete) token.onboardingComplete = true;
+          }
+          return token;
+        }
 
         const isCredentials = account?.provider === "staff-login";
 
