@@ -81,9 +81,11 @@ export default async function ClientJobsPage() {
               <span className="text-xs text-gray-500">
                 {countMap.get(job.id) ?? 0} applicant{(countMap.get(job.id) ?? 0) !== 1 ? "s" : ""}
               </span>
-              <div className="flex gap-2">
+              <div className="flex gap-3">
+                <Link href={`/jobs/${job.id}`} target="_blank"
+                  className="text-sm font-medium text-gray-400 hover:text-gray-700">Frontend ↗</Link>
                 <Link href={`/client/jobs/${job.id}`}
-                  className="text-sm font-medium text-blue-600 hover:text-blue-800">View</Link>
+                  className="text-sm font-medium text-blue-600 hover:text-blue-800">View Applicants</Link>
                 <Link href={`/client/jobs/${job.id}/edit`}
                   className="text-sm font-medium text-gray-600 hover:text-gray-900">Edit</Link>
               </div>

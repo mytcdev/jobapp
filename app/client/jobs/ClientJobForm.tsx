@@ -7,10 +7,18 @@ import SkillsInput from "@/components/SkillsInput";
 import JobDescriptionEditor from "@/components/JobDescriptionEditor";
 import NationalityPicker from "@/components/NationalityPicker";
 import CategoryPicker from "@/components/CategoryPicker";
+import RequirementsInput from "@/components/RequirementsInput";
 
 const CURRENCIES = ["USD", "SGD", "MYR", "GBP", "AUD", "EUR", "CAD", "INR"];
-const STATUSES   = [{ value: "draft", label: "Draft" }, { value: "pending", label: "Pending Review" }, { value: "published", label: "Published" }];
+const STATUSES   = [{ value: "draft", label: "Draft" }, { value: "pending", label: "Pending Review" }, { value: "published", label: "Published" }, { value: "closed", label: "Closed" }];
 const WORK_TYPES = [{ value: "onsite", label: "On-site" }, { value: "remote", label: "Remote" }, { value: "hybrid", label: "Hybrid" }];
+const EMPLOYMENT_TYPES = [
+  { value: "full_time",  label: "Full-time" },
+  { value: "part_time",  label: "Part-time" },
+  { value: "contract",   label: "Contract" },
+  { value: "internship", label: "Internship" },
+  { value: "freelance",  label: "Freelance" },
+];
 
 export type ClientJobValues = {
   id?: string;
@@ -18,8 +26,9 @@ export type ClientJobValues = {
   city?: string; state?: string; country?: string; postal_code?: string;
   required_skills?: string[];
   salary_min?: number; salary_max?: number; salary_currency?: string;
-  status?: string; work_type?: string; accepted_nationality?: string | null;
+  status?: string; work_type?: string; employment_type?: string | null; accepted_nationality?: string | null;
   category_ids?: string[];
+  requirements?: string[];
 };
 
 export default function ClientJobForm({ initial }: { initial?: ClientJobValues }) {
@@ -27,6 +36,7 @@ export default function ClientJobForm({ initial }: { initial?: ClientJobValues }
   const isEdit = !!initial?.id;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [saved, setSaved] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -35,14 +45,17 @@ export default function ClientJobForm({ initial }: { initial?: ClientJobValues }
 
     const fd = new FormData(e.currentTarget);
     const skills = (fd.get("required_skills") as string).split(",").map((s) => s.trim()).filter(Boolean);
+    const requirements = (fd.getAll("requirement") as string[]).map((s) => s.trim()).filter(Boolean);
     const body: Record<string, unknown> = {
       title: fd.get("title"), company: fd.get("company"), description: fd.get("description"),
       city: fd.get("city"), state: fd.get("state"), country: fd.get("country"),
       postal_code: (fd.get("postal_code") as string)?.trim() || null,
       required_skills: skills, salary_currency: fd.get("salary_currency"),
       status: fd.get("status"), work_type: fd.get("work_type"),
+      employment_type: (fd.get("employment_type") as string) || null,
       accepted_nationality: (fd.get("accepted_nationality") as string)?.trim() || null,
       category_ids: ((fd.get("category_ids") as string) ?? "").split(",").filter(Boolean),
+      requirements,
     };
     const min = fd.get("salary_min") as string;
     const max = fd.get("salary_max") as string;
@@ -53,8 +66,13 @@ export default function ClientJobForm({ initial }: { initial?: ClientJobValues }
       const url = isEdit ? `/api/client/jobs/${initial!.id}` : "/api/client/jobs";
       const res = await fetch(url, { method: isEdit ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (!res.ok) { const { error: msg } = await res.json(); throw new Error(msg ?? "Failed"); }
-      router.push("/client/jobs");
-      router.refresh();
+      if (isEdit) {
+        setSaved(true);
+        router.refresh();
+      } else {
+        const { job } = await res.json();
+        router.push(`/client/jobs/${job.id}/edit`);
+      }
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -64,17 +82,19 @@ export default function ClientJobForm({ initial }: { initial?: ClientJobValues }
 
   return (
     <form onSubmit={handleSubmit} className="bg-white border rounded-xl p-6 flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium" htmlFor="title">Job Title</label>
-        <input id="title" name="title" type="text" placeholder="e.g. Frontend Engineer"
-          defaultValue={initial?.title ?? ""} required
-          className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black" />
-      </div>
-      <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium" htmlFor="company">Company</label>
-        <input id="company" name="company" type="text" placeholder="e.g. Acme Corp"
-          defaultValue={initial?.company ?? ""} required
-          className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-medium" htmlFor="title">Job Title</label>
+          <input id="title" name="title" type="text" placeholder="e.g. Frontend Engineer"
+            defaultValue={initial?.title ?? ""} required
+            className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-medium" htmlFor="company">Company</label>
+          <input id="company" name="company" type="text" placeholder="e.g. Acme Corp"
+            defaultValue={initial?.company ?? ""} required
+            className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black" />
+        </div>
       </div>
 
       <LocationPicker
@@ -110,12 +130,20 @@ export default function ClientJobForm({ initial }: { initial?: ClientJobValues }
 
       <JobDescriptionEditor initialContent={initial?.description ?? ""} />
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium" htmlFor="work_type">Work Type</label>
           <select id="work_type" name="work_type" defaultValue={initial?.work_type ?? "onsite"}
             className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black">
             {WORK_TYPES.map((w) => <option key={w.value} value={w.value}>{w.label}</option>)}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-medium" htmlFor="employment_type">Employment Type</label>
+          <select id="employment_type" name="employment_type" defaultValue={initial?.employment_type ?? ""}
+            className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black">
+            <option value="">— Not specified —</option>
+            {EMPLOYMENT_TYPES.map((e) => <option key={e.value} value={e.value}>{e.label}</option>)}
           </select>
         </div>
         <div className="flex flex-col gap-1">
@@ -131,9 +159,12 @@ export default function ClientJobForm({ initial }: { initial?: ClientJobValues }
 
       <CategoryPicker initialIds={initial?.category_ids ?? []} />
 
+      <RequirementsInput initial={initial?.requirements ?? []} />
+
+      {saved && <p className="text-green-600 text-sm">Changes saved successfully.</p>}
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
-      <button type="submit" disabled={loading}
+      <button type="submit" disabled={loading} onClick={() => { setSaved(false); setError(""); }}
         className="bg-black text-white py-2.5 rounded-lg font-medium hover:bg-gray-800 transition-colors disabled:opacity-50">
         {loading ? (isEdit ? "Saving…" : "Creating…") : (isEdit ? "Save Changes" : "Create Job")}
       </button>

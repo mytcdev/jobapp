@@ -18,11 +18,13 @@ const JobSchema = z.object({
   salary_currency: z.string().default("USD"),
   salary_min: z.number().positive().optional(),
   salary_max: z.number().positive().optional(),
-  status: z.enum(["draft", "pending", "published"]).default("draft"),
+  status: z.enum(["draft", "pending", "published", "closed"]).default("draft"),
   work_type: z.enum(["onsite", "remote", "hybrid"]).default("onsite"),
+  employment_type: z.enum(["full_time", "part_time", "contract", "internship", "freelance"]).optional().nullable(),
   accepted_nationality: z.string().optional().nullable(),
   owner_id: z.string().uuid().optional().nullable(),
   category_ids: z.array(z.string().uuid()).optional().default([]),
+  requirements: z.array(z.string()).optional().default([]),
 });
 
 async function syncCategories(jobId: string, categoryIds: string[]) {
@@ -54,6 +56,9 @@ export async function PUT(
 
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 });
   await syncCategories(params.id, category_ids);
+  if (parsed.data.status === "closed") {
+    await supabase.from("applications").update({ status: "expired" }).eq("job_id", params.id).eq("status", "pending");
+  }
   revalidatePath("/jobs");
   revalidatePath(`/jobs/${params.id}`);
   return NextResponse.json({ job });

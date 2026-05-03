@@ -1,5 +1,3 @@
-"use client";
-
 import { Node, mergeAttributes } from "@tiptap/core";
 import { ReactNodeViewRenderer, NodeViewWrapper, type ReactNodeViewProps } from "@tiptap/react";
 import { useRef, useState, useCallback } from "react";

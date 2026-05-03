@@ -80,12 +80,11 @@ export default function PwaBanner() {
     <div className="fixed bottom-0 left-0 right-0 z-50 p-3 safe-area-bottom">
       <div className="bg-white border border-gray-200 rounded-2xl shadow-xl p-4 flex items-start gap-3 max-w-lg mx-auto">
         {/* App icon */}
-        <div className="shrink-0 w-12 h-12 rounded-xl bg-black flex items-center justify-center">
-          <span className="text-white font-bold text-xl">J</span>
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/LOGO.jpg" alt="KareerHub" className="shrink-0 w-12 h-12 rounded-xl object-contain border border-gray-100" />
 
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm">Add JobApp to your home screen</p>
+          <p className="font-semibold text-sm">Add KareerHub to your home screen</p>
           {mode === "android" ? (
             <p className="text-xs text-gray-500 mt-0.5">
               Install for quick access — works offline too.

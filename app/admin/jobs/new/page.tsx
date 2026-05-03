@@ -11,7 +11,7 @@ export default async function NewJobPage() {
     .order("username");
 
   return (
-    <div className="max-w-xl">
+    <div>
       <h1 className="text-2xl font-bold mb-6">New Job</h1>
       <JobForm clients={clients ?? []} />
     </div>

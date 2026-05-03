@@ -8,14 +8,15 @@ import Footer from "@/components/Footer";
 import { getMenu } from "@/lib/menus";
 import SwRegister from "@/components/SwRegister";
 import PwaBanner from "@/components/PwaBanner";
+import ConditionalShell from "./ConditionalShell";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://jobapp.example.com";
-const SITE_NAME = "JobApp";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kareerhub.example.com";
+const SITE_NAME = "KareerHub";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} – Find Your Next Role`,
+    default: `${SITE_NAME} — Smarter Matching. Better Careers.`,
     template: `%s | ${SITE_NAME}`,
   },
   description: "Smart job portal with skill matching. Browse thousands of open positions and see your exact match percentage for every job.",
@@ -53,11 +54,19 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+      </head>
+      <body className="bg-[#f9f9fc] text-gray-900 min-h-screen flex flex-col">
         <Providers>
-          <Navbar menuItems={headerItems} />
-          <main className="max-w-5xl mx-auto px-4 py-8 flex-1 w-full">{children}</main>
-          <Footer items={footerItems} />
+          <ConditionalShell
+            navbar={<Navbar menuItems={headerItems} />}
+            footer={<Footer items={footerItems} />}
+          >
+            {children}
+          </ConditionalShell>
           <PwaBanner />
           <SwRegister />
         </Providers>

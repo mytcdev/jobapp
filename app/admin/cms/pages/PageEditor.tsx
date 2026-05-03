@@ -4,7 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 
-const RichEditor = dynamic(() => import("@/components/RichEditor"), { ssr: false });
+const RichEditor = dynamic(() => import("@/components/RichEditor"), {
+  ssr: false,
+  loading: () => <div className="border rounded-xl min-h-[320px] bg-gray-50 animate-pulse" />,
+});
 
 type PageValues = {
   id?: string;

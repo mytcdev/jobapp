@@ -21,7 +21,7 @@ export default async function EditStaffPage({ params }: { params: { id: string }
   const [{ data: account }, session] = await Promise.all([
     supabase
       .from("staff_accounts")
-      .select("id, username, role, status, created_at, company_name, company_address, company_website, contact_email, contact_phone")
+      .select("id, username, role, status, created_at, company_name, company_address, company_website, contact_email, contact_phone, featured, industry, company_size, founded_year, company_url, short_description")
       .eq("id", params.id)
       .single(),
     getServerSession(getAuthOptions()),
@@ -40,7 +40,7 @@ export default async function EditStaffPage({ params }: { params: { id: string }
   };
 
   return (
-    <div className="max-w-md flex flex-col gap-6">
+    <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-4">
         <div>
           <Link href="/admin/staff" className="text-sm text-gray-400 hover:text-gray-600 mb-1 inline-block">
@@ -71,19 +71,28 @@ export default async function EditStaffPage({ params }: { params: { id: string }
         </section>
       )}
 
-      <EditStaffForm staffId={account.id} currentRole={account.role} isSelf={isSelf} />
-
-      {account.role === "client" && (
-        <div>
-          <h2 className="font-semibold mb-3">Company Details</h2>
-          <AdminCompanyForm staffId={account.id} initial={{
-            company_name:    account.company_name,
-            company_address: account.company_address,
-            company_website: account.company_website,
-            contact_email:   account.contact_email,
-            contact_phone:   account.contact_phone,
-          }} />
+      {account.role === "client" ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+          <EditStaffForm staffId={account.id} currentRole={account.role} isSelf={isSelf} />
+          <div>
+            <h2 className="font-semibold mb-3">Company Details</h2>
+            <AdminCompanyForm staffId={account.id} initial={{
+              company_name:      account.company_name,
+              company_address:   account.company_address,
+              company_website:   account.company_website,
+              contact_email:     account.contact_email,
+              contact_phone:     account.contact_phone,
+              featured:          account.featured,
+              industry:          account.industry,
+              company_size:      account.company_size,
+              founded_year:      account.founded_year,
+              company_url:       account.company_url,
+              short_description: account.short_description,
+            }} />
+          </div>
         </div>
+      ) : (
+        <EditStaffForm staffId={account.id} currentRole={account.role} isSelf={isSelf} />
       )}
     </div>
   );

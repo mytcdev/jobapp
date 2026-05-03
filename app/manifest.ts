@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "JobApp – Find Your Next Role",
-    short_name: "JobApp",
-    description: "Smart job portal with skill matching",
+    name: "KareerHub — Smarter Matching. Better Careers.",
+    short_name: "KareerHub",
+    description: "Smarter job matching. Better careers.",
     start_url: "/",
     display: "standalone",
     background_color: "#f9fafb",

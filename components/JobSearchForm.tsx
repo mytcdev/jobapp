@@ -119,11 +119,11 @@ export default function JobSearchForm({
   // ── Sizing tokens ─────────────────────────────────────────────────────────
   const isHero = variant === "hero";
   const inputCls = isHero
-    ? "w-full border rounded-xl px-5 py-4 text-base focus:outline-none focus:ring-2 focus:ring-black bg-white"
-    : "w-full border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black bg-white";
+    ? "w-full border border-gray-200 rounded-xl px-5 py-4 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+    : "w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white";
   const btnCls = isHero
-    ? "bg-black text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-gray-800 transition-colors whitespace-nowrap"
-    : "bg-black text-white px-6 py-3 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors whitespace-nowrap";
+    ? "bg-emerald-700 text-white px-8 py-4 rounded-xl text-base font-semibold hover:bg-emerald-800 transition-colors whitespace-nowrap shadow-sm"
+    : "bg-emerald-700 text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-emerald-800 transition-colors whitespace-nowrap shadow-sm";
 
   const countryId = `country-list-${variant}`;
 

@@ -20,7 +20,7 @@ export default async function EditClientJobPage({ params }: { params: { id: stri
   if (error || !job) notFound();
 
   return (
-    <div className="max-w-xl">
+    <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Edit Job</h1>
         <DeleteClientJobButton jobId={job.id} />

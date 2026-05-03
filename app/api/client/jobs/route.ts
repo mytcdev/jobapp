@@ -18,10 +18,12 @@ const JobSchema = z.object({
   salary_min: z.number().positive().optional(),
   salary_max: z.number().positive().optional(),
   salary_currency: z.string().default("USD"),
-  status: z.enum(["draft", "pending", "published"]).default("draft"),
+  status: z.enum(["draft", "pending", "published", "closed"]).default("draft"),
   work_type: z.enum(["onsite", "remote", "hybrid"]).default("onsite"),
+  employment_type: z.enum(["full_time", "part_time", "contract", "internship", "freelance"]).optional().nullable(),
   accepted_nationality: z.string().optional().nullable(),
   category_ids: z.array(z.string().uuid()).optional().default([]),
+  requirements: z.array(z.string()).optional().default([]),
 });
 
 async function syncCategories(jobId: string, categoryIds: string[]) {

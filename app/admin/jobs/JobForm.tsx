@@ -7,17 +7,26 @@ import SkillsInput from "@/components/SkillsInput";
 import JobDescriptionEditor from "@/components/JobDescriptionEditor";
 import NationalityPicker from "@/components/NationalityPicker";
 import CategoryPicker from "@/components/CategoryPicker";
+import RequirementsInput from "@/components/RequirementsInput";
 
 const CURRENCIES = ["USD", "SGD", "MYR", "GBP", "AUD", "EUR", "CAD", "INR"];
 const STATUSES = [
   { value: "draft", label: "Draft" },
   { value: "pending", label: "Pending" },
   { value: "published", label: "Published" },
+  { value: "closed", label: "Closed" },
 ];
 const WORK_TYPES = [
   { value: "onsite", label: "On-site" },
   { value: "remote", label: "Remote" },
   { value: "hybrid", label: "Hybrid" },
+];
+const EMPLOYMENT_TYPES = [
+  { value: "full_time",   label: "Full-time" },
+  { value: "part_time",   label: "Part-time" },
+  { value: "contract",    label: "Contract" },
+  { value: "internship",  label: "Internship" },
+  { value: "freelance",   label: "Freelance" },
 ];
 
 export type JobFormValues = {
@@ -35,9 +44,11 @@ export type JobFormValues = {
   salary_currency?: string;
   status?: string;
   work_type?: string;
+  employment_type?: string | null;
   accepted_nationality?: string | null;
   owner_id?: string | null;
   category_ids?: string[];
+  requirements?: string[];
 };
 
 export type ClientOption = { id: string; username: string; company_name: string | null };
@@ -58,6 +69,7 @@ export default function JobForm({ initial, clients }: { initial?: JobFormValues;
     const fd = new FormData(e.currentTarget);
     const skills = (fd.get("required_skills") as string)
       .split(",").map((s) => s.trim()).filter(Boolean);
+    const requirements = (fd.getAll("requirement") as string[]).map((s) => s.trim()).filter(Boolean);
 
     const body: Record<string, unknown> = {
       title: fd.get("title"),
@@ -71,9 +83,11 @@ export default function JobForm({ initial, clients }: { initial?: JobFormValues;
       salary_currency: fd.get("salary_currency"),
       status: fd.get("status"),
       work_type: fd.get("work_type"),
+      employment_type: (fd.get("employment_type") as string) || null,
       accepted_nationality: (fd.get("accepted_nationality") as string)?.trim() || null,
       owner_id: (fd.get("owner_id") as string) || null,
       category_ids: ((fd.get("category_ids") as string) ?? "").split(",").filter(Boolean),
+      requirements,
     };
     const min = fd.get("salary_min") as string;
     const max = fd.get("salary_max") as string;
@@ -108,8 +122,10 @@ export default function JobForm({ initial, clients }: { initial?: JobFormValues;
 
   return (
     <form onSubmit={handleSubmit} className="bg-white border rounded-xl p-6 flex flex-col gap-4">
-      <Field name="title" label="Job Title" placeholder="e.g. Senior Frontend Engineer" defaultValue={initial?.title} />
-      <Field name="company" label="Company" placeholder="e.g. Acme Corp" defaultValue={initial?.company} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Field name="title" label="Job Title" placeholder="e.g. Senior Frontend Engineer" defaultValue={initial?.title} />
+        <Field name="company" label="Company" placeholder="e.g. Acme Corp" defaultValue={initial?.company} />
+      </div>
 
       <LocationPicker
         initialCountry={initial?.country}
@@ -134,12 +150,21 @@ export default function JobForm({ initial, clients }: { initial?: JobFormValues;
 
       <JobDescriptionEditor initialContent={initial?.description ?? ""} />
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium" htmlFor="work_type">Work Type</label>
           <select id="work_type" name="work_type" defaultValue={initial?.work_type ?? "onsite"}
             className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black">
             {WORK_TYPES.map((w) => <option key={w.value} value={w.value}>{w.label}</option>)}
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-medium" htmlFor="employment_type">Employment Type</label>
+          <select id="employment_type" name="employment_type" defaultValue={initial?.employment_type ?? ""}
+            className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black">
+            <option value="">— Not specified —</option>
+            {EMPLOYMENT_TYPES.map((e) => <option key={e.value} value={e.value}>{e.label}</option>)}
           </select>
         </div>
 
@@ -156,6 +181,8 @@ export default function JobForm({ initial, clients }: { initial?: JobFormValues;
       <NationalityPicker initialValue={initial?.accepted_nationality} />
 
       <CategoryPicker initialIds={initial?.category_ids ?? []} />
+
+      <RequirementsInput initial={initial?.requirements ?? []} />
 
       {clients && clients.length > 0 && (
         <div className="flex flex-col gap-1">

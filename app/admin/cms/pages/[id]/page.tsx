@@ -16,7 +16,7 @@ export default async function EditCmsPagePage({ params }: { params: { id: string
   if (error || !page) notFound();
 
   return (
-    <div className="max-w-3xl">
+    <div>
       <div className="flex items-center justify-between mb-6">
         <div>
           <Link href="/admin/cms/pages" className="text-sm text-gray-400 hover:text-gray-600 mb-1 inline-block">

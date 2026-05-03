@@ -31,7 +31,7 @@ export default async function OnboardingPage({
     <div className="min-h-[calc(100vh-56px)] flex items-center justify-center py-12">
       <div className="w-full max-w-lg px-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Welcome to JobApp</h1>
+          <h1 className="text-3xl font-bold mb-2">Welcome to KareerHub</h1>
           <p className="text-gray-500">
             Set up your profile to get personalised job matches and apply in seconds.
           </p>

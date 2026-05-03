@@ -7,7 +7,6 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { getAuthOptions } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import MatchBar from "@/components/MatchBar";
 import ManualProfileForm from "./ManualProfileForm";
 import ProfileForm from "./ProfileForm";
 import TagEditor from "./TagEditor";
@@ -20,24 +19,14 @@ export default async function ProfilePage() {
   const session = await getServerSession(getAuthOptions());
   if (!session) redirect("/auth/signin?callbackUrl=/profile");
 
-  const [userResult, appsResult] = await Promise.all([
-    supabase.from("users").select("*").eq("id", session.user.id).single(),
-    supabase
-      .from("applications")
-      .select("id, status, match_percentage, jobs(title, company)")
-      .eq("user_id", session.user.id)
-      .order("id", { ascending: false }),
-  ]);
-
-  const user = userResult.data;
+  const { data: user } = await supabase.from("users").select("*").eq("id", session.user.id).single();
 
   if (user && !user.onboarding_complete) {
     redirect("/onboarding?from=/profile");
   }
-  const applications = appsResult.data ?? [];
 
   return (
-    <div className="max-w-2xl flex flex-col gap-8">
+    <div className="flex flex-col gap-8">
       <h1 className="text-2xl font-bold">Your Profile</h1>
 
       {/* ── Account Info ─────────────────────────────────────── */}
@@ -135,29 +124,6 @@ export default async function ProfilePage() {
         <ProfileForm initialBio={user?.bio ?? ""} />
       </section>
 
-      {/* ── Applications ─────────────────────────────────────── */}
-      {applications.length > 0 && (
-        <section>
-          <h2 className="font-semibold mb-3">Your Applications</h2>
-          <div className="flex flex-col gap-3">
-            {applications.map((app) => {
-              const job = Array.isArray(app.jobs) ? app.jobs[0] : app.jobs;
-              return (
-                <div key={app.id} className="bg-white border rounded-xl p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <p className="font-medium">{(job as { title: string } | null)?.title}</p>
-                      <p className="text-sm text-gray-500">{(job as { company: string } | null)?.company}</p>
-                    </div>
-                    <StatusBadge status={app.status} />
-                  </div>
-                  <MatchBar percent={app.match_percentage} />
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
     </div>
   );
 }
@@ -169,20 +135,5 @@ function Field({ label, value }: { label: string; value?: string | null }) {
       <p className="text-xs text-gray-500">{label}</p>
       <p className="text-sm font-medium">{value}</p>
     </div>
-  );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    pending: "bg-gray-100 text-gray-600",
-    reviewed: "bg-blue-100 text-blue-600",
-    interview: "bg-purple-100 text-purple-600",
-    offer: "bg-green-100 text-green-600",
-    rejected: "bg-red-100 text-red-600",
-  };
-  return (
-    <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${styles[status] ?? styles.pending}`}>
-      {status.charAt(0).toUpperCase() + status.slice(1)}
-    </span>
   );
 }

@@ -16,7 +16,7 @@ export default async function EditJobPage({ params }: { params: { id: string } }
   const categoryIds = (jobCats ?? []).map((r) => r.category_id);
 
   return (
-    <div className="max-w-xl">
+    <div>
       <h1 className="text-2xl font-bold mb-6">Edit Job</h1>
       <JobForm clients={clients ?? []} initial={{
         id: job.id,

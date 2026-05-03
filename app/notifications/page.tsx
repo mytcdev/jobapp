@@ -20,6 +20,7 @@ const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
   interview:   { label: "Interview",    cls: "bg-purple-100 text-purple-700" },
   offer:       { label: "Offer",        cls: "bg-emerald-100 text-emerald-700" },
   declined:    { label: "Declined",     cls: "bg-red-100 text-red-600" },
+  expired:     { label: "Expired",      cls: "bg-gray-100 text-gray-400" },
   reviewed:    { label: "Under Review", cls: "bg-blue-100 text-blue-700" },
   rejected:    { label: "Rejected",     cls: "bg-red-100 text-red-600" },
 };
@@ -88,7 +89,7 @@ export default async function NotificationsPage() {
   const notifications = data ?? [];
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Notifications</h1>
         <PushSubscribe />

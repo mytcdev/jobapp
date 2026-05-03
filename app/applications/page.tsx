@@ -18,6 +18,7 @@ const STATUS_CONFIG: Record<string, { label: string; classes: string }> = {
   interview:   { label: "Interview",   classes: "bg-purple-100 text-purple-600" },
   offer:       { label: "Offer",       classes: "bg-green-100 text-green-600" },
   declined:    { label: "Declined",    classes: "bg-red-100 text-red-600" },
+  expired:     { label: "Expired",     classes: "bg-gray-100 text-gray-400" },
   // legacy
   reviewed:    { label: "Reviewed",    classes: "bg-blue-100 text-blue-600" },
   rejected:    { label: "Declined",    classes: "bg-red-100 text-red-600" },

@@ -17,7 +17,7 @@ export default async function NewClientJobPage() {
     .single();
 
   return (
-    <div className="max-w-xl">
+    <div>
       <h1 className="text-2xl font-bold mb-6">Create Job</h1>
       <ClientJobForm initial={{
         company: profile?.company_name ?? "",

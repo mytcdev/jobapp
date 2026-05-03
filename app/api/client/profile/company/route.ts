@@ -7,11 +7,16 @@ import { getAuthOptions } from "@/lib/auth";
 import { getSupabase } from "@/lib/supabase";
 
 const BodySchema = z.object({
-  company_name:    z.string().nullable(),
-  company_address: z.string().nullable(),
-  company_website: z.string().nullable(),
-  contact_email:   z.string().nullable(),
-  contact_phone:   z.string().nullable(),
+  company_name:      z.string().nullable(),
+  company_address:   z.string().nullable(),
+  company_website:   z.string().nullable(),
+  contact_email:     z.string().nullable(),
+  contact_phone:     z.string().nullable(),
+  industry:          z.string().nullable().optional(),
+  company_size:      z.string().nullable().optional(),
+  founded_year:      z.number().int().min(1900).max(new Date().getFullYear()).nullable().optional(),
+  company_url:       z.string().nullable().optional(),
+  short_description: z.string().nullable().optional(),
 });
 
 export async function PUT(req: NextRequest) {

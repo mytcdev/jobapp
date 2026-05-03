@@ -1,4 +1,4 @@
-const CACHE = "jobapp-v1";
+const CACHE = "kareerhub-v1";
 const PRECACHE = ["/", "/jobs"];
 
 self.addEventListener("install", (e) => {
@@ -36,7 +36,7 @@ self.addEventListener("fetch", (e) => {
 // ── Push notifications ────────────────────────────────────────────────────────
 
 self.addEventListener("push", (e) => {
-  let data = { title: "JobApp", body: "You have a new notification.", url: "/notifications" };
+  let data = { title: "KareerHub", body: "You have a new notification.", url: "/notifications" };
   try { data = { ...data, ...e.data.json() }; } catch {}
 
   e.waitUntil(

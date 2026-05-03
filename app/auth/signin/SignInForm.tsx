@@ -10,7 +10,7 @@ export default function SignInForm() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold">Welcome to JobApp</h1>
+        <h1 className="text-3xl font-bold">Welcome to KareerHub</h1>
         <p className="text-gray-500 mt-2">Sign in to apply for jobs and track your applications.</p>
       </div>
 

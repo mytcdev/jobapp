@@ -4,7 +4,7 @@ import { sendStatusChangeEmail, sendNewApplicationEmail } from "@/lib/email";
 
 export async function notifyUser(userId: string, message: string, link: string) {
   await supabase.from("notifications").insert({ user_id: userId, message, link });
-  await pushToUser(userId, { title: "JobApp", body: message, url: link });
+  await pushToUser(userId, { title: "KareerHub", body: message, url: link });
 
   // Email — fire-and-forget; requires message to match status-change pattern
   const { data: user } = await supabase
@@ -34,7 +34,7 @@ export async function notifyStaff(
   meta?: { applicantName?: string; jobTitle?: string },
 ) {
   await supabase.from("notifications").insert({ staff_id: staffId, message, link });
-  await pushToStaff(staffId, { title: "JobApp", body: message, url: link });
+  await pushToStaff(staffId, { title: "KareerHub", body: message, url: link });
 
   // Email — fire-and-forget
   const { data: staff } = await supabase
