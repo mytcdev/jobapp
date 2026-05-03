@@ -1,4 +1,4 @@
-const CACHE = "kareerhub-v1";
+const CACHE = "kareerhub-v2";
 const PRECACHE = ["/", "/jobs"];
 
 self.addEventListener("install", (e) => {
@@ -17,22 +17,29 @@ self.addEventListener("activate", (e) => {
 
 self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET") return;
+
   const url = new URL(e.request.url);
+
+  // Never intercept navigation requests — Next.js App Router needs
+  // server-side auth checks and RSC rendering to work unobstructed.
+  if (e.request.mode === "navigate") return;
+
+  // Skip API, Next.js internals, and cross-origin requests.
   if (url.pathname.startsWith("/api/")) return;
   if (url.pathname.startsWith("/_next/")) return;
+  if (url.origin !== self.location.origin) return;
 
+  // Cache-first for static assets (icons, images, manifest).
   e.respondWith(
-    fetch(e.request)
-      .then((res) => {
-        if (res.ok && res.type !== "opaque" && url.origin === self.location.origin) {
-          const clone = res.clone();
-          caches.open(CACHE).then((c) => c.put(e.request, clone));
+    caches.match(e.request).then((cached) => {
+      if (cached) return cached;
+      return fetch(e.request).then((res) => {
+        if (res.ok) {
+          caches.open(CACHE).then((c) => c.put(e.request, res.clone()));
         }
         return res;
-      })
-      .catch(() =>
-        caches.match(e.request).then((cached) => cached ?? Response.error())
-      )
+      });
+    })
   );
 });
 
