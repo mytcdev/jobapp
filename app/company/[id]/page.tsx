@@ -173,7 +173,7 @@ export default async function CompanyPage({ params }: { params: { id: string } }
 
                 {(job.required_skills?.length ?? 0) > 0 && (
                   <div className="flex flex-wrap gap-1.5">
-                    {job.required_skills!.map((s) => <Badge key={s} label={s} />)}
+                    {job.required_skills!.map((s: string) => <Badge key={s} label={s} />)}
                   </div>
                 )}
 
