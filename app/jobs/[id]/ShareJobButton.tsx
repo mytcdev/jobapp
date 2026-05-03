@@ -13,6 +13,12 @@ export default function ShareJobButton({ title, company, jobUrl }: Props) {
   const [copied, setCopied] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
+  // Ensure we always have an absolute URL regardless of whether NEXT_PUBLIC_SITE_URL is set
+  const absoluteUrl =
+    typeof window !== "undefined" && jobUrl.startsWith("/")
+      ? `${window.location.origin}${jobUrl}`
+      : jobUrl;
+
   useEffect(() => {
     function onDown(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
@@ -24,21 +30,21 @@ export default function ShareJobButton({ title, company, jobUrl }: Props) {
   const handleShare = useCallback(async () => {
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
-        await navigator.share({ title: `${title} at ${company}`, url: jobUrl });
+        await navigator.share({ title: `${title} at ${company}`, url: absoluteUrl });
         return;
       } catch {}
     }
     setOpen((o) => !o);
-  }, [title, company, jobUrl]);
+  }, [title, company, absoluteUrl]);
 
   const copyLink = useCallback(async () => {
-    await navigator.clipboard.writeText(jobUrl);
+    await navigator.clipboard.writeText(absoluteUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  }, [jobUrl]);
+  }, [absoluteUrl]);
 
   const text = encodeURIComponent(`${title} at ${company}`);
-  const url  = encodeURIComponent(jobUrl);
+  const url  = encodeURIComponent(absoluteUrl);
 
   const ACTIONS = [
     {
