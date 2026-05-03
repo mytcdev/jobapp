@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const EXAMPLE_BIO = `Jane Doe
 Frontend Developer | Kuala Lumpur, Malaysia
@@ -30,6 +31,7 @@ SALARY
 Targeting MYR 96,000/year`;
 
 export default function ProfileForm({ initialBio }: { initialBio: string }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [bio, setBio] = useState(initialBio);
   const [loading, setLoading] = useState(false);
@@ -54,7 +56,7 @@ export default function ProfileForm({ initialBio }: { initialBio: string }) {
       }
       setStatus("success");
       setOpen(false);
-      window.location.reload();
+      router.refresh();
     } catch (e) {
       setErrorMsg((e as Error).message);
       setStatus("error");
