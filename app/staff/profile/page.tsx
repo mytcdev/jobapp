@@ -12,7 +12,7 @@ export default async function StaffProfilePage() {
 
   const { data: account } = await getSupabase()
     .from("staff_accounts")
-    .select("id, username, role, created_at")
+    .select("id, username, role, created_at, account_contact_email, account_contact_phone")
     .eq("id", session.user.staffId)
     .single();
 
@@ -37,6 +37,14 @@ export default async function StaffProfilePage() {
               <p className="font-medium">
                 {account?.created_at ? new Date(account.created_at).toLocaleDateString() : "—"}
               </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Contact Email</p>
+              <p className="font-medium">{account?.account_contact_email ?? <span className="text-gray-400 font-normal">Not set</span>}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Contact Phone</p>
+              <p className="font-medium">{account?.account_contact_phone ?? <span className="text-gray-400 font-normal">Not set</span>}</p>
             </div>
           </div>
         </section>

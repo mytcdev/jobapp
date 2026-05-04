@@ -9,11 +9,16 @@ import { getServerSession } from "next-auth";
 import { getAuthOptions } from "@/lib/auth";
 
 const PatchSchema = z.object({
-  role:     z.enum(["admin", "manager", "staff", "client"]).optional(),
-  password: z.string().min(8).optional(),
-}).refine((d) => d.role !== undefined || d.password !== undefined, {
-  message: "Provide role or password",
-});
+  role:                    z.enum(["admin", "manager", "staff", "client"]).optional(),
+  password:                z.string().min(8).optional(),
+  account_contact_email:   z.string().email().optional(),
+  account_contact_phone:   z.string().nullable().optional(),
+}).refine((d) =>
+  d.role !== undefined ||
+  d.password !== undefined ||
+  d.account_contact_email !== undefined,
+  { message: "Provide role, password, or contact info" },
+);
 
 export async function PATCH(
   req: NextRequest,
@@ -28,8 +33,10 @@ export async function PATCH(
   }
 
   const update: Record<string, unknown> = {};
-  if (parsed.data.role)     update.role = parsed.data.role;
-  if (parsed.data.password) update.password_hash = await bcrypt.hash(parsed.data.password, 12);
+  if (parsed.data.role)                  update.role = parsed.data.role;
+  if (parsed.data.password)              update.password_hash = await bcrypt.hash(parsed.data.password, 12);
+  if (parsed.data.account_contact_email !== undefined) update.account_contact_email = parsed.data.account_contact_email;
+  if (parsed.data.account_contact_phone !== undefined) update.account_contact_phone = parsed.data.account_contact_phone;
 
   const { data, error: dbError } = await supabase
     .from("staff_accounts")

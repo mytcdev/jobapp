@@ -7,6 +7,7 @@ import { getAuthOptions } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import EditStaffForm from "./EditStaffForm";
 import AdminCompanyForm from "./AdminCompanyForm";
+import AdminContactForm from "./AdminContactForm";
 import StaffStatusDropdown from "./StaffStatusDropdown";
 import DeleteStaffButton from "../DeleteStaffButton";
 
@@ -21,7 +22,7 @@ export default async function EditStaffPage({ params }: { params: { id: string }
   const [{ data: account }, session] = await Promise.all([
     supabase
       .from("staff_accounts")
-      .select("id, username, role, status, created_at, company_name, company_address, company_website, contact_email, contact_phone, featured, industry, company_size, founded_year, company_url, short_description")
+      .select("id, username, role, status, created_at, account_contact_email, account_contact_phone, company_name, company_address, company_website, contact_email, contact_phone, featured, industry, company_size, founded_year, company_url, short_description")
       .eq("id", params.id)
       .single(),
     getServerSession(getAuthOptions()),
@@ -68,6 +69,19 @@ export default async function EditStaffPage({ params }: { params: { id: string }
         <section className="bg-white border rounded-xl p-6">
           <h2 className="font-semibold mb-4">Account Status</h2>
           <StaffStatusDropdown staffId={account.id} currentStatus={(account.status ?? "active") as "active" | "pending" | "blocked"} />
+        </section>
+      )}
+
+      {account.role !== "admin" && (
+        <section>
+          <h2 className="font-semibold mb-3">Account Contact</h2>
+          <AdminContactForm
+            staffId={account.id}
+            initial={{
+              account_contact_email: account.account_contact_email,
+              account_contact_phone: account.account_contact_phone,
+            }}
+          />
         </section>
       )}
 

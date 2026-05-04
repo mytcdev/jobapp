@@ -41,8 +41,7 @@ export default function StaffSignInForm() {
   return (
     <div className="flex flex-col gap-6 w-full max-w-sm">
       <div className="text-center">
-        <h1 className="text-2xl font-bold">Staff Login</h1>
-        <p className="text-gray-500 text-sm mt-1">Admin &amp; staff access only.</p>
+        <h1 className="text-2xl font-bold">Login</h1>
       </div>
 
       <form
